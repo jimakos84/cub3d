@@ -16,7 +16,7 @@ LIBMLX  := ./MLX42
 LIBFT   := ./libft
 HEADERS := -I ./include -I $(LIBMLX)/include -I $(LIBFT)/include
 LIBS    := $(LIBMLX)/build/libmlx42.a -L $(LIBFT) -lft -ldl -lglfw -pthread -lm
-SRCS    := src/main.c src/validation.c
+SRCS    := src/main.c src/validation.c src/utils.c
 
 OBJS    := ${SRCS:.c=.o}
 

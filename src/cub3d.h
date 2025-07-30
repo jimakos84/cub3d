@@ -18,9 +18,27 @@
 # include <fcntl.h>
 # include <stdio.h>
 
+typedef struct s_config
+{
+	char	*no_path;
+	char	*so_path;
+	char	*we_path;
+	char	*ea_path;
+	char	*c_path;
+	char	*f_path;
+	bool	no;
+	bool	so;
+	bool	we;
+	bool	ea;
+	bool	f;
+	bool	c;
+}	t_config;
+
 typedef struct s_map
 {
-	char	**map;
+	char		**map;
+	bool		player;
+	t_config	*config;
 }	t_map;
 
 	//~~~~~~~~MAP VALIDATION~~~~~~~~//
@@ -28,6 +46,17 @@ typedef struct s_map
 void	file_valid(char *filename);
 void	map_parsing(t_map *map, char *filename);
 void	map_parsing2(t_map *map, char *filename);
+void	map_validation(t_map *map);
+bool	assets_found(t_map *map);
+void	set_path(char **dest, bool *seen, char *line, t_map *map);
+
+	//~~~~~~~~UTILS~~~~~~~~//
+
 int		print_err(t_map *map, char *error, int fd);
+void	free_stuff(t_map *map);
+
+	//~~~~~~~~INIT~~~~~~~~//
+
+void	init_map(t_map *map);
 
 #endif

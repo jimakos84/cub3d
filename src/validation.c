@@ -61,6 +61,7 @@ void	map_parsing(t_map *map, char *filename)
 		line = get_next_line(fd);
 		i++;
 	}
+	i += 1;
 	map->map = malloc(sizeof(char *) * i);
 	if (!map->map)
 		exit(print_err(map, "Malloc failed", fd));
@@ -76,6 +77,7 @@ void	map_parsing2(t_map *map, char *filename)
 {
 	int		i;
 	int		fd;
+	char	*temp;
 
 	i = 0;
 	fd = open(filename, O_RDONLY);
@@ -87,14 +89,59 @@ void	map_parsing2(t_map *map, char *filename)
 	}
 	map->map[i] = NULL;
 	close(fd);
+	i = 0;
+	while (map->map[i])
+	{
+		temp = map->map[i];
+		map->map[i] = ft_strtrim(temp, " \t");
+		free(temp);
+		i++;
+	}
+	map_validation(map);
 }
 
-int	print_err(t_map *map, char *error, int fd)
+void	map_validation(t_map *map)
 {
-	while (*error)
-		write(2, error++, 1);
-	write (2, "\n", 1);
-	free(map);
-	close(fd);
-	return (1);
+	int		i;
+	int		j;
+
+	i = 0;
+	j = 0;
+	while (map->map[j])
+	{
+		if (ft_strncmp("NO ", map->map[j], 3) == 0)
+			set_path(&map->config->no_path, &map->config->no, map->map[j], map);
+		else if (ft_strncmp("WE ", map->map[j], 3) == 0)
+			set_path(&map->config->we_path, &map->config->we, map->map[j], map);
+		else if (ft_strncmp("EA ", map->map[j], 3) == 0)
+			set_path(&map->config->ea_path, &map->config->ea, map->map[j], map);
+		else if (ft_strncmp("SO ", map->map[j], 3) == 0)
+			set_path(&map->config->so_path, &map->config->so, map->map[j], map);
+		else if (ft_strncmp("F ", map->map[j], 2) == 0)
+			set_path(&map->config->f_path, &map->config->f, map->map[j], map);
+		else if (ft_strncmp("C ", map->map[j], 2) == 0)
+			set_path(&map->config->c_path, &map->config->c, map->map[j], map);
+		j++;
+	}
+}
+
+// bool	assets_found(t_map *map)
+// {
+// 	if (map->config->c && map->config->ea && map->config->f
+// 			&& map->config->no && map->config->so && map->config->we)
+// 			return (true);
+// 	else
+// 		return (false);
+// }
+
+void	set_path(char **dest, bool *seen, char *line, t_map *map)
+{
+	if (*seen)
+	{
+		ft_putendl_fd("Duplicate asset!", 2);
+		free_stuff(map);
+		exit(1);
+	}
+	*seen = true;
+	*dest = ft_strtrim(ft_strchr(line, ' '), " \t\n");
 }
