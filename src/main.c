@@ -49,12 +49,6 @@ int	main(int argc, char **argv)
 		{
 			init_map(map);
 			map_parsing(map, argv[1]);
-			printf("asset: %s\n", map->config->c_path);
-			printf("asset: %s\n", map->config->f_path);
-			printf("asset: %s\n", map->config->no_path);
-			printf("asset: %s\n", map->config->so_path);
-			printf("asset: %s\n", map->config->ea_path);
-			printf("asset: %s\n", map->config->we_path);
 			free_stuff(map);
 		}
 		return (0);

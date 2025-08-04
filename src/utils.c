@@ -12,13 +12,55 @@
 
 #include "cub3d.h"
 
+bool	is_map_line(char *line)
+{
+	while (*line == ' ' || *line == '\t')
+		line++;
+	while (*line)
+	{
+		if (*line != ' ' && *line != '0' && *line != '1' &&
+			*line != 'N' && *line != 'S' && *line != 'E' && *line != 'W')
+			return (false);
+		line++;
+	}
+	return (true);
+}
+
+bool	is_config_line(char *line)
+{
+	while (*line == ' ' || *line == '\t')
+		line++;
+	if(	ft_strncmp("NO ", line, 3) == 0 ||
+		ft_strncmp("SO ", line, 3) == 0 ||
+		ft_strncmp("WE ", line, 3) == 0 ||
+		ft_strncmp("EA ", line, 3) == 0 ||
+		ft_strncmp("F ", line, 2) == 0 ||
+		ft_strncmp("C ", line, 2) == 0)
+			return (true);
+	else
+		return (false);
+}
+
+bool	is_empty_line(char *line)
+{
+	if (*line == '\n')
+		return (true);
+	while(*line)
+	{
+		if (*line != ' ' && *line != '\t')
+			return (false);
+		line++;
+	}
+	return (true);
+}
+
 int	print_err(t_map *map, char *error, int fd)
 {
-	while (*error)
-		write(2, error++, 1);
-	write (2, "\n", 1);
-	free(map);
-	close(fd);
+	if (*error)
+		ft_putendl_fd(error, 2);
+	free_stuff(map);
+	if (fd >= 0)
+		close(fd);
 	return (1);
 }
 

@@ -77,7 +77,6 @@ void	map_parsing2(t_map *map, char *filename)
 {
 	int		i;
 	int		fd;
-	char	*temp;
 
 	i = 0;
 	fd = open(filename, O_RDONLY);
@@ -92,53 +91,70 @@ void	map_parsing2(t_map *map, char *filename)
 	i = 0;
 	while (map->map[i])
 	{
-		temp = map->map[i];
-		map->map[i] = ft_strtrim(temp, " \t");
-		free(temp);
+		if (is_config_line(map->map[i]))
+			config_validation(map, map->map[i]);
 		i++;
 	}
-	map_validation(map);
 }
 
-void	map_validation(t_map *map)
+void	config_validation(t_map *map, char *config_line)
+{
+	while (*config_line == ' ' || *config_line == '\t')
+		config_line++;
+	if (ft_strncmp("NO ", config_line, 3) == 0)
+		set_path(&map->config->no_path, &map->config->no, config_line, map);
+	else if (ft_strncmp("WE ", config_line, 3) == 0)
+		set_path(&map->config->we_path, &map->config->we, config_line, map);
+	else if (ft_strncmp("EA ", config_line, 3) == 0)
+		set_path(&map->config->ea_path, &map->config->ea, config_line, map);
+	else if (ft_strncmp("SO ", config_line, 3) == 0)
+		set_path(&map->config->so_path, &map->config->so, config_line, map);
+	else if (ft_strncmp("F ", config_line, 2) == 0)
+		set_path(&map->config->f_path, &map->config->f, config_line, map);
+	else if (ft_strncmp("C ", config_line, 2) == 0)
+		set_path(&map->config->c_path, &map->config->c, config_line, map);
+	map_validation2(map);
+}
+
+void	map_validation2(t_map *map)
 {
 	int		i;
-	int		j;
+	int		config_count;
+	bool	map_started;
 
 	i = 0;
-	j = 0;
-	while (map->map[j])
+	config_count = 0;
+	map_started = false;
+	while (map->map[i])
 	{
-		if (ft_strncmp("NO ", map->map[j], 3) == 0)
-			set_path(&map->config->no_path, &map->config->no, map->map[j], map);
-		else if (ft_strncmp("WE ", map->map[j], 3) == 0)
-			set_path(&map->config->we_path, &map->config->we, map->map[j], map);
-		else if (ft_strncmp("EA ", map->map[j], 3) == 0)
-			set_path(&map->config->ea_path, &map->config->ea, map->map[j], map);
-		else if (ft_strncmp("SO ", map->map[j], 3) == 0)
-			set_path(&map->config->so_path, &map->config->so, map->map[j], map);
-		else if (ft_strncmp("F ", map->map[j], 2) == 0)
-			set_path(&map->config->f_path, &map->config->f, map->map[j], map);
-		else if (ft_strncmp("C ", map->map[j], 2) == 0)
-			set_path(&map->config->c_path, &map->config->c, map->map[j], map);
-		j++;
+		if (is_empty_line(map->map[i]) || map->map[i][0] == '\n')
+		{
+			i++;
+			continue ;
+		}
+		if (is_config_line(map->map[i]))
+			config_count++;
+		else if (is_map_line(map->map[i]))
+		{
+			printf("config:%d\n", config_count);
+			if (config_count != 6)
+				exit(print_err(map, "Missing configuration lines", -1));
+			map_started = true;
+			break ;
+		}
+		else
+			exit(print_err(map, "Invalid line before map", -1));
+		i++;
 	}
+	if (!map_started)
+		exit(print_err(map, "Map not found after configuration", -1));
 }
-
-// bool	assets_found(t_map *map)
-// {
-// 	if (map->config->c && map->config->ea && map->config->f
-// 			&& map->config->no && map->config->so && map->config->we)
-// 			return (true);
-// 	else
-// 		return (false);
-// }
 
 void	set_path(char **dest, bool *seen, char *line, t_map *map)
 {
 	if (*seen)
 	{
-		ft_putendl_fd("Duplicate asset!", 2);
+		ft_putendl_fd("Error: Duplicate asset!", 2);
 		free_stuff(map);
 		exit(1);
 	}

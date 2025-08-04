@@ -46,14 +46,17 @@ typedef struct s_map
 void	file_valid(char *filename);
 void	map_parsing(t_map *map, char *filename);
 void	map_parsing2(t_map *map, char *filename);
-void	map_validation(t_map *map);
-bool	assets_found(t_map *map);
+void	config_validation(t_map *map, char *config_line);
+void	map_validation2(t_map *map);
 void	set_path(char **dest, bool *seen, char *line, t_map *map);
 
 	//~~~~~~~~UTILS~~~~~~~~//
 
 int		print_err(t_map *map, char *error, int fd);
 void	free_stuff(t_map *map);
+bool	is_empty_line(char *line);
+bool	is_config_line(char *line);
+bool	is_map_line(char *line);
 
 	//~~~~~~~~INIT~~~~~~~~//
 
