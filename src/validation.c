@@ -17,7 +17,7 @@ This functions ensures that the map file exists and permissions allow us to
 open it. Secondly it checks whether the extension is the correct one.
 */
 
-void	file_valid(char *filename)
+void	file_valid(char *filename, char *ext1, char *ext2)
 {
 	int		len;
 	int		fd;
@@ -31,8 +31,8 @@ void	file_valid(char *filename)
 	else
 		close(fd);
 	len = ft_strlen(filename);
-	if (len < 5 || ft_strncmp(filename + len - 4, ".cub", 4)
-		|| !ft_strncmp(filename + len - 5, "/.cub", 5))
+	if (len < 5 || ft_strncmp(filename + len - 4, ext1, 4)
+		|| !ft_strncmp(filename + len - 5, ext2, 5))
 	{
 		ft_putstr_fd("Invalid file!\n", 2);
 		exit(1);
@@ -95,6 +95,7 @@ void	map_parsing2(t_map *map, char *filename)
 			config_validation(map, map->map[i]);
 		i++;
 	}
+	map_validation2(map);
 }
 
 void	config_validation(t_map *map, char *config_line)
@@ -113,7 +114,6 @@ void	config_validation(t_map *map, char *config_line)
 		set_path(&map->config->f_path, &map->config->f, config_line, map);
 	else if (ft_strncmp("C ", config_line, 2) == 0)
 		set_path(&map->config->c_path, &map->config->c, config_line, map);
-	map_validation2(map);
 }
 
 void	map_validation2(t_map *map)
@@ -129,6 +129,8 @@ void	map_validation2(t_map *map)
 	{
 		if (is_empty_line(map->map[i]) || map->map[i][0] == '\n')
 		{
+			if (map_started)
+				exit(print_err(map, "Empty line in the map", -1));
 			i++;
 			continue ;
 		}
@@ -136,11 +138,11 @@ void	map_validation2(t_map *map)
 			config_count++;
 		else if (is_map_line(map->map[i]))
 		{
-			printf("config:%d\n", config_count);
 			if (config_count != 6)
-				exit(print_err(map, "Missing configuration lines", -1));
+				exit(print_err(map, "Error: configuration failed", -1));
 			map_started = true;
-			break ;
+			i++;
+			continue ;
 		}
 		else
 			exit(print_err(map, "Invalid line before map", -1));
@@ -148,15 +150,54 @@ void	map_validation2(t_map *map)
 	}
 	if (!map_started)
 		exit(print_err(map, "Map not found after configuration", -1));
+	map_validation3(map);
+}
+
+void	map_validation3(t_map *map)
+{
+	int		i;
+
+	i = 0;
+	while(is_config_line(map->map[i]) || is_empty_line(map->map[i]))
+		i++;
+	validate_player(map, i);
+}
+
+void	validate_player(t_map *map, int	map_start)
+{
+	int		i;
+
+	map->player = false;
+	while(map->map[map_start])
+	{
+		i = 0;
+		while (map->map[map_start][i])
+		{
+			if (map->map[map_start][i] == 'N' || map->map[map_start][i] == 'S' ||
+				map->map[map_start][i] == 'W' || map->map[map_start][i] == 'E')
+				{
+					map->player = true;
+					break;
+				}
+			i++;
+		}
+		if (map->player)
+			break ;
+		map_start++;
+	}
+	if (!map->player)
+		exit(print_err(map, "Player not found", -1));
+	map->player_x = i;
+	map->player_y = map_start;
+	map->player_dir = map->map[map_start][i];
+	printf("Player %c x/y: %d %d\n", map->player_dir, i, map_start);
 }
 
 void	set_path(char **dest, bool *seen, char *line, t_map *map)
 {
 	if (*seen)
 	{
-		ft_putendl_fd("Error: Duplicate asset!", 2);
-		free_stuff(map);
-		exit(1);
+		exit(print_err(map, "Error: Duplicate asset", -1));
 	}
 	*seen = true;
 	*dest = ft_strtrim(ft_strchr(line, ' '), " \t\n");

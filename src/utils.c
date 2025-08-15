@@ -19,14 +19,15 @@ bool	is_map_line(char *line)
 	while (*line)
 	{
 		if (*line != ' ' && *line != '0' && *line != '1' &&
-			*line != 'N' && *line != 'S' && *line != 'E' && *line != 'W')
+			*line != 'N' && *line != 'S' && *line != 'E' &&
+			*line != 'W' && *line != '\n')
 			return (false);
 		line++;
 	}
 	return (true);
 }
 
-bool	is_config_line(char *line)
+bool		is_config_line(char *line)
 {
 	while (*line == ' ' || *line == '\t')
 		line++;

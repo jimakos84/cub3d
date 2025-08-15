@@ -41,7 +41,7 @@ int	main(int argc, char **argv)
 
 	if (argc == 2)
 	{
-		file_valid(argv[1]);
+		file_valid(argv[1], ".cub", "/.cub");
 		map = malloc(sizeof(t_map));
 		if (!map)
 			return (1);

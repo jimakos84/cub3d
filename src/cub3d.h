@@ -38,17 +38,22 @@ typedef struct s_map
 {
 	char		**map;
 	bool		player;
+	char		player_dir;
 	t_config	*config;
+	int			player_x;
+	int			player_y;
 }	t_map;
 
 	//~~~~~~~~MAP VALIDATION~~~~~~~~//
 
-void	file_valid(char *filename);
+void	file_valid(char *filename, char *ext1, char *ext2);
 void	map_parsing(t_map *map, char *filename);
 void	map_parsing2(t_map *map, char *filename);
 void	config_validation(t_map *map, char *config_line);
 void	map_validation2(t_map *map);
+void	map_validation3(t_map *map);
 void	set_path(char **dest, bool *seen, char *line, t_map *map);
+void	validate_player(t_map *map, int	map_start);
 
 	//~~~~~~~~UTILS~~~~~~~~//
 
