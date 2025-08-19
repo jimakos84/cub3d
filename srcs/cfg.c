@@ -12,23 +12,6 @@
 
 #include "cub3d.h"
 
-void	ft_split_free(char **split)
-{
-	int	i;
-
-	if (!split)
-		return ;
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		split[i] = NULL;
-		i++;
-	}
-	free(split);
-}
-
-
 t_config	*mock_config(char *filename)
 {
 	t_config	*cfg;

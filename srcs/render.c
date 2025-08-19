@@ -25,12 +25,12 @@ static void	fill_floor_ceiling(t_game *game)
 	i = 0;
 	while (i < half)
 	{
-		p[i] = CEILING_COLOR;
+		p[i] = color_converter(color_atoia(game->cfg->ceiling_color));
 		i++;
 	}
 	while (i < total)
 	{
-		p[i] = FLOOR_COLOR;
+		p[i] = color_converter(color_atoia(game->cfg->floor_color));
 		i++;
 	}
 }

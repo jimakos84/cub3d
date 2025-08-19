@@ -196,3 +196,40 @@ void	set_path(char **dest, bool *seen, char *line, t_config *cfg)
 	*seen = true;
 	*dest = ft_strtrim(ft_strchr(line, ' '), " \t\n");
 }
+
+int			*color_atoia(const char *color_string)
+{
+	int		*rgb;
+	char	**token;
+	int		i;
+
+	i = 0;
+	rgb = malloc(sizeof(int) * 3);
+	token = ft_split(color_string, ',');
+	while (token[i] && i < 3)
+	{
+		rgb [i] = ft_atoi(token[i]);
+		if (rgb[i] < 0) rgb[i] = 0;
+		if (rgb[i] > 255) rgb[i] = 255;
+		i++;
+	}
+	i = 0;
+	while (token[i])
+	{
+		free(token[i++]);
+	}
+	free(token);
+	return(rgb);
+}
+
+uint32_t	color_converter(int *rgb)
+{
+	uint32_t	color;
+
+	color = 0xFF000000;
+	color |= (rgb[0] << 16);
+	color |= (rgb[1] << 8);
+	color |= rgb[2];
+	return (color);
+}
+

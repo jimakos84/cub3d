@@ -15,14 +15,16 @@
 
 /* Map parsing & validation*/
 
-void	file_valid(char *filename, char *ext1, char *ext2);
-void	map_parsing(t_config *cfg, char *filename);
-void	map_parsing2(t_config *cfg, char *filename);
-void	config_validation(t_config *cfg, char *config_line);
-void	map_validation2(t_config *cfg);
-void	map_validation3(t_config *cfg);
-void	validate_player(t_config *cfg, int	map_start);
-void	set_path(char **dest, bool *seen, char *line, t_config *cfg);
+void		file_valid(char *filename, char *ext1, char *ext2);
+void		map_parsing(t_config *cfg, char *filename);
+void		map_parsing2(t_config *cfg, char *filename);
+void		config_validation(t_config *cfg, char *config_line);
+void		map_validation2(t_config *cfg);
+void		map_validation3(t_config *cfg);
+void		validate_player(t_config *cfg, int	map_start);
+void		set_path(char **dest, bool *seen, char *line, t_config *cfg);
+uint32_t	color_converter(int *rgb);
+int			*color_atoia(const char *color_string);
 
 /* Parsing utils*/
 
