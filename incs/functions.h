@@ -16,23 +16,24 @@
 /* Map parsing & validation*/
 
 void		file_valid(char *filename, char *ext1, char *ext2);
-void		map_parsing(t_config *cfg, char *filename);
-void		map_parsing2(t_config *cfg, char *filename);
+bool		map_parsing(t_config *cfg, char *filename);
+bool		map_parsing2(t_config *cfg, char *filename);
 void		config_validation(t_config *cfg, char *config_line);
-void		map_validation2(t_config *cfg);
-void		map_validation3(t_config *cfg);
-void		validate_player(t_config *cfg, int	map_start);
+bool		map_validation2(t_config *cfg);
+bool		map_validation3(t_config *cfg);
+bool		validate_player(t_config *cfg, int map_start);
 void		set_path(char **dest, bool *seen, char *line, t_config *cfg);
 uint32_t	color_converter(int *rgb);
 int			*color_atoia(const char *color_string);
 
 /* Parsing utils*/
 
-bool	is_map_line(char *line);
-bool	is_config_line(char *line);
-bool	is_empty_line(char *line);
-int		print_err(t_config *cfg, char *error, int fd);
-void	free_partial_config(t_config *cfg);
+bool		is_map_line(char *line);
+bool		is_config_line(char *line);
+bool		is_empty_line(char *line);
+int			print_err(t_config *cfg, char *error, int fd);
+void		free_partial_config(t_config *cfg);
+void		free_cfg_textures(t_config *cfg);
 
 /* Initialization and Config */
 t_config	*mock_config(char *filename);

@@ -6,7 +6,7 @@
 /*   By: dvlachos <dvlachos@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 13:10:39 by dvlachos          #+#    #+#             */
-/*   Updated: 2025/08/18 13:10:41 by dvlachos         ###   ########.fr       */
+/*   Updated: 2025/08/20 15:31:27 by dvlachos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ the amounts of lines in the file, in order to allocate the correct
 amount of memory.
 */
 
-void	map_parsing(t_config *cfg, char *filename)
+bool	map_parsing(t_config *cfg, char *filename)
 {
 	int		fd;
 	int		i;
@@ -47,34 +47,41 @@ void	map_parsing(t_config *cfg, char *filename)
 
 	i = 0;
 	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+		return (print_err(cfg, "Cannot open map file", -1));
 	line = get_next_line(fd);
 	if (!line)
-		exit(print_err(cfg, "Empty", fd));
+		return (print_err(cfg, "Empty map file", fd));
 	while (line)
 	{
 		free(line);
 		line = get_next_line(fd);
 		i++;
 	}
+	free(line);
 	i += 1;
 	cfg->map = malloc(sizeof(char *) * i);
 	if (!cfg->map)
-		exit(print_err(cfg, "Malloc failed", fd));
+		return (print_err(cfg, "Malloc failed", fd));
 	close(fd);
-	map_parsing2(cfg, filename);
+	if (!map_parsing2(cfg, filename))
+		return (false);
+	return (true);
 }
 
 // /*
 // This function saves the contents of the file into a 2d array.
 // */
 
-void	map_parsing2(t_config *cfg, char *filename)
+bool	map_parsing2(t_config *cfg, char *filename)
 {
-	int		i;
-	int		fd;
+	int	i;
+	int	fd;
 
-	i = 0;
 	fd = open(filename, O_RDONLY);
+	i = 0;
+	if (fd < 0)
+		return (print_err(cfg, "Cannot reopen map file", -1));
 	cfg->map[i] = get_next_line(fd);
 	while (cfg->map[i] != NULL)
 	{
@@ -90,7 +97,9 @@ void	map_parsing2(t_config *cfg, char *filename)
 			config_validation(cfg, cfg->map[i]);
 		i++;
 	}
-	map_validation2(cfg);
+	if (!map_validation2(cfg))
+		return (false);
+	return (true);
 }
 
 void	config_validation(t_config *cfg, char *config_line)
@@ -111,7 +120,7 @@ void	config_validation(t_config *cfg, char *config_line)
 		set_path(&cfg->ceiling_color, &cfg->c, config_line, cfg);
 }
 
-void	map_validation2(t_config *cfg)
+bool	map_validation2(t_config *cfg)
 {
 	int		i;
 	int		config_count;
@@ -125,7 +134,7 @@ void	map_validation2(t_config *cfg)
 		if (is_empty_line(cfg->map[i]) || cfg->map[i][0] == '\n')
 		{
 			if (map_started)
-				exit(print_err(cfg, "Empty line in the map", -1));
+				return (print_err(cfg, "Empty line in the map", -1));
 			i++;
 			continue ;
 		}
@@ -134,46 +143,45 @@ void	map_validation2(t_config *cfg)
 		else if (is_map_line(cfg->map[i]))
 		{
 			if (config_count != 6)
-				exit(print_err(cfg, "Error: configuration failed", -1));
+				return (print_err(cfg, "Missing configuration entries", -1));
 			map_started = true;
-			i++;
-			continue ;
 		}
 		else
-			exit(print_err(cfg, "Invalid line before map", -1));
+			return (print_err(cfg, "Invalid line before map", -1));
 		i++;
 	}
 	if (!map_started)
-		exit(print_err(cfg, "Map not found after configuration", -1));
-	map_validation3(cfg);
+		return (print_err(cfg, "Map not found after configuration", -1));
+	return (map_validation3(cfg));
 }
 
-void	map_validation3(t_config *cfg)
+bool	map_validation3(t_config *cfg)
 {
-	int		i;
+	int	i;
 
 	i = 0;
-	while(is_config_line(cfg->map[i]) || is_empty_line(cfg->map[i]))
+	while (is_config_line(cfg->map[i]) || is_empty_line(cfg->map[i]))
 		i++;
-	validate_player(cfg, i);
+	return (validate_player(cfg, i));
 }
 
-void	validate_player(t_config *cfg, int	map_start)
+bool	validate_player(t_config *cfg, int map_start)
 {
-	int		i;
+	int	i;
 
 	cfg->player = false;
-	while(cfg->map[map_start])
+	while (cfg->map[map_start])
 	{
 		i = 0;
 		while (cfg->map[map_start][i])
 		{
-			if (cfg->map[map_start][i] == 'N' || cfg->map[map_start][i] == 'S' ||
+			if (cfg->map[map_start][i] == 'N' ||
+				cfg->map[map_start][i] == 'S' ||
 				cfg->map[map_start][i] == 'W' || cfg->map[map_start][i] == 'E')
-				{
-					cfg->player = true;
-					break;
-				}
+			{
+				cfg->player = true;
+				break ;
+			}
 			i++;
 		}
 		if (cfg->player)
@@ -181,10 +189,11 @@ void	validate_player(t_config *cfg, int	map_start)
 		map_start++;
 	}
 	if (!cfg->player)
-		exit(print_err(cfg, "Player not found", -1));
+		return (print_err(cfg, "Player not found in map", -1));
 	cfg->player_x = i;
 	cfg->player_y = map_start;
 	cfg->player_dir = cfg->map[map_start][i];
+	return (true);
 }
 
 void	set_path(char **dest, bool *seen, char *line, t_config *cfg)
@@ -197,7 +206,7 @@ void	set_path(char **dest, bool *seen, char *line, t_config *cfg)
 	*dest = ft_strtrim(ft_strchr(line, ' '), " \t\n");
 }
 
-int			*color_atoia(const char *color_string)
+int	*color_atoia(const char *color_string)
 {
 	int		*rgb;
 	char	**token;
@@ -209,8 +218,10 @@ int			*color_atoia(const char *color_string)
 	while (token[i] && i < 3)
 	{
 		rgb [i] = ft_atoi(token[i]);
-		if (rgb[i] < 0) rgb[i] = 0;
-		if (rgb[i] > 255) rgb[i] = 255;
+		if (rgb[i] < 0)
+			rgb[i] = 0;
+		if (rgb[i] > 255)
+			rgb[i] = 255;
 		i++;
 	}
 	i = 0;
@@ -219,7 +230,7 @@ int			*color_atoia(const char *color_string)
 		free(token[i++]);
 	}
 	free(token);
-	return(rgb);
+	return (rgb);
 }
 
 uint32_t	color_converter(int *rgb)
@@ -232,4 +243,3 @@ uint32_t	color_converter(int *rgb)
 	color |= rgb[2];
 	return (color);
 }
-

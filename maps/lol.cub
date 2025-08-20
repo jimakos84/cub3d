@@ -1,9 +1,8 @@
 NO textures/north.png
 		  SO textures/south.png
-  WE textures/west.png
+WE textures/west.png
+EA textures/east.png
 
-
-	EA textures/east.png
 
 
 
