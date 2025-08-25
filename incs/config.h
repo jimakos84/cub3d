@@ -23,8 +23,6 @@
 # define HEIGHT 1600
 
 /* Colors */
-// # define CEILING_COLOR 0xFF003C99
-// # define FLOOR_COLOR 0xFF000000
 # define CHAR_COLOR 0xFFFFFF
 
 /* HUD settings */
@@ -68,10 +66,6 @@
 # define TEX_SPRITE 5
 
 /* Texture file paths */
-// # define NORTH_TEXTURE_PATH "textures/north.png"
-// # define SOUTH_TEXTURE_PATH "textures/south.png"
-// # define WEST_TEXTURE_PATH  "textures/west.png"
-// # define EAST_TEXTURE_PATH  "textures/east.png"
 # define DOOR_TEXTURE_PATH  "textures/door.png"
 # define SPRITE_TEXTURE_PATH "textures/sprite.png"
 

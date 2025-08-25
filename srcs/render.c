@@ -16,21 +16,23 @@ static void	fill_floor_ceiling(t_game *game)
 {
 	uint32_t	*p;
 	int			i;
-	int			half;
 	int			total;
+	uint32_t	floor;
+	uint32_t	ceiling;
 
+	floor = color_converter(color_atoia(game->cfg->floor_color));
+	ceiling = color_converter(color_atoia(game->cfg->ceiling_color));
 	p = (uint32_t *)game->img->pixels;
 	total = WIDTH * HEIGHT;
-	half = total / 2;
 	i = 0;
-	while (i < half)
+	while (i < total / 2)
 	{
-		p[i] = color_converter(color_atoia(game->cfg->ceiling_color));
+		p[i] = ceiling;
 		i++;
 	}
 	while (i < total)
 	{
-		p[i] = color_converter(color_atoia(game->cfg->floor_color));
+		p[i] = floor;
 		i++;
 	}
 }

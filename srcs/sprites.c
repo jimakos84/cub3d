@@ -24,7 +24,7 @@ static int	count_sprites(char **map)
 	{
 		x = 0;
 		while (map[y][x])
-			if (map[y][x++] == 'S')
+			if (map[y][x++] == 'X')
 				c++;
 		y++;
 	}
@@ -49,7 +49,7 @@ void	parse_sprites(t_game *g)
 	{
 		x = -1;
 		while (g->cfg->map[y][++x])
-			if (g->cfg->map[y][x] == 'S')
+			if (g->cfg->map[y][x] == 'X')
 				init_sprite(&g->sprites[i++], x, y);
 	}
 }

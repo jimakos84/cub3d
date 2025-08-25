@@ -238,8 +238,8 @@ uint32_t	color_converter(int *rgb)
 	uint32_t	color;
 
 	color = 0xFF000000;
-	color |= (rgb[0] << 16);
+	color |= (rgb[2] << 16);
 	color |= (rgb[1] << 8);
-	color |= rgb[2];
+	color |= rgb[0];
 	return (color);
 }

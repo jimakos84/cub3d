@@ -21,7 +21,7 @@ bool	is_map_line(char *line)
 		if (*line != ' ' && *line != '0' && *line != '1'
 			&& *line != 'N' && *line != 'S' && *line != 'E'
 			&& *line != 'W' && *line != '\n' && *line != 'D'
-			&& *line != 'S')
+			&& *line != 'X')
 			return (false);
 		line++;
 	}
