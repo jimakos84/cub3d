@@ -66,26 +66,6 @@ int	print_err(t_config *cfg, char *error, int fd)
 	return (0);
 }
 
-void	free_partial_config(t_config *cfg)
-{
-	int	i;
-
-	i = 0;
-	if (!cfg)
-		return ;
-	if (cfg->map && cfg->map[i])
-	{
-		while (cfg->map[i])
-			free(cfg->map[i++]);
-	}
-	if (cfg->map)
-	{
-		free(cfg->map);
-	}
-	free_cfg_textures(cfg);
-	free(cfg);
-}
-
 void	free_cfg_textures(t_config *cfg)
 {
 	if (cfg->ceiling_color)

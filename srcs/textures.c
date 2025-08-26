@@ -6,17 +6,21 @@
 /*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 13:32:32 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/08/13 18:10:07 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/08/26 13:46:10 by dvlachos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	load_texture(mlx_t *mlx, t_texture *texture, char *path)
+static int	load_texture(mlx_t *mlx, t_texture *texture, char *path,
+		t_config *cfg)
 {
 	texture->img = mlx_load_png(path);
 	if (!texture->img)
+	{
+		cleanup_cfg_textures_paths(cfg);
 		return (0);
+	}
 	texture->width = texture->img->width;
 	texture->height = texture->img->height;
 	texture->image = mlx_texture_to_image(mlx, texture->img);
@@ -46,7 +50,7 @@ int	load_textures(t_game *game)
 		game->textures[i] = malloc(sizeof(t_texture));
 		if (!game->textures[i])
 			return (free_textures(game, i), 0);
-		if (!load_texture(game->mlx, game->textures[i], paths[i]))
+		if (!load_texture(game->mlx, game->textures[i], paths[i], game->cfg))
 			return (free_textures(game, i + 1), 0);
 		i++;
 	}
@@ -64,32 +68,6 @@ int	get_texture_index(int side, float ray_dir_x, float ray_dir_y)
 	if (ray_dir_y > 0)
 		return (TEX_EAST);
 	return (TEX_WEST);
-}
-
-int	get_texture_index_door(t_game *game, int map_x, int map_y)
-{
-	int	i;
-
-	if (!game || !game->doors)
-		return (-1);
-	i = 0;
-	while (i < game->num_doors)
-	{
-		if (game->doors[i].x == map_x && game->doors[i].y == map_y)
-		{
-			if (game->doors[i].open_ratio == 0.0f)
-			{
-				if (game->textures[TEX_DOOR] && game->textures[TEX_DOOR]->image)
-				{
-					return (TEX_DOOR);
-				}
-				return (-1);
-			}
-			return (-1);
-		}
-		i++;
-	}
-	return (-1);
 }
 
 int	get_texture_color(t_game *game, int tex_id, int tex_x, int tex_y)

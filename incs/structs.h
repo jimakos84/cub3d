@@ -46,7 +46,7 @@ typedef struct s_config
 	bool		ea;
 	bool		f;
 	bool		c;
-	bool		player;
+	int			player;
 	char		**map;
 	int			player_x;
 	int			player_y;
