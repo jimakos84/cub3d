@@ -116,3 +116,19 @@ bool	process_config_lines2(t_config *cfg, int *i, int *config_count,
 	}
 	return (true);
 }
+
+bool	map_validation2(t_config *cfg)
+{
+	int		i;
+	int		config_count;
+	bool	map_started;
+
+	i = 0;
+	config_count = 0;
+	map_started = false;
+	if (!process_config_lines2(cfg, &i, &config_count, &map_started))
+		return (false);
+	if (!map_started)
+		return (print_err(cfg, "Map not found after configuration", -1));
+	return (map_validation3(cfg));
+}
