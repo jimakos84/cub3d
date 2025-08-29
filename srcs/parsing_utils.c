@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dvlachos <dvlachos@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 13:02:06 by dvlachos          #+#    #+#             */
-/*   Updated: 2025/08/20 15:20:43 by dvlachos         ###   ########.fr       */
+/*   Updated: 2025/08/28 13:44:05 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ bool	is_map_line(char *line)
 	{
 		if (*line != ' ' && *line != '0' && *line != '1'
 			&& *line != 'N' && *line != 'S' && *line != 'E'
-			&& *line != 'W' && *line != '\n' && *line != 'D'
-			&& *line != 'X')
+			&& *line != 'W' && *line != 'D' && *line != 'X'
+			&& *line != '\n')
 			return (false);
 		line++;
 	}

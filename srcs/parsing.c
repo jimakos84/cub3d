@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dvlachos <dvlachos@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/18 13:10:39 by dvlachos          #+#    #+#             */
-/*   Updated: 2025/08/20 15:31:27 by dvlachos         ###   ########.fr       */
+/*   Updated: 2025/08/29 16:31:34 by dvlachos         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,6 @@ bool	map_parsing(t_config *cfg, char *filename)
 
 	i = 0;
 	fd = open(filename, O_RDONLY);
-	if (fd < 0)
-		return (print_err(cfg, "Cannot open map file", -1));
 	line = get_next_line(fd);
 	if (!line)
 		return (print_err(cfg, "Empty map file", fd));
@@ -73,35 +71,6 @@ bool	map_parsing(t_config *cfg, char *filename)
 // This function saves the contents of the file into a 2d array.
 // */
 
-bool	map_parsing2(t_config *cfg, char *filename)
-{
-	int	i;
-	int	fd;
-
-	fd = open(filename, O_RDONLY);
-	i = 0;
-	if (fd < 0)
-		return (print_err(cfg, "Cannot reopen map file", -1));
-	cfg->map[i] = get_next_line(fd);
-	while (cfg->map[i] != NULL)
-	{
-		i++;
-		cfg->map[i] = get_next_line(fd);
-	}
-	cfg->map[i] = NULL;
-	close(fd);
-	i = 0;
-	while (cfg->map[i])
-	{
-		if (is_config_line(cfg->map[i]))
-			config_validation(cfg, cfg->map[i]);
-		i++;
-	}
-	if (!map_validation2(cfg))
-		return (false);
-	return (true);
-}
-
 void	config_validation(t_config *cfg, char *config_line)
 {
 	while (*config_line == ' ' || *config_line == '\t')
@@ -120,37 +89,30 @@ void	config_validation(t_config *cfg, char *config_line)
 		set_path(&cfg->ceiling_color, &cfg->c, config_line, cfg);
 }
 
-bool	map_validation2(t_config *cfg)
+bool	process_config_lines2(t_config *cfg, int *i, int *config_count,
+		bool *map_started)
 {
-	int		i;
-	int		config_count;
-	bool	map_started;
-
-	i = 0;
-	config_count = 0;
-	map_started = false;
-	while (cfg->map[i])
+	while (cfg->map[*i])
 	{
-		if (is_empty_line(cfg->map[i]) || cfg->map[i][0] == '\n')
+		if (is_empty_line(cfg->map[*i]) || cfg->map[*i][0] == '\n')
 		{
-			if (map_started)
+			if (*map_started)
 				return (print_err(cfg, "Empty line in the map", -1));
-			i++;
+			(*i)++;
 			continue ;
 		}
-		if (is_config_line(cfg->map[i]))
-			config_count++;
-		else if (is_map_line(cfg->map[i]))
+		if (is_config_line(cfg->map[*i]))
+			(*config_count)++;
+		else if (is_map_line(cfg->map[*i]))
 		{
-			if (config_count != 6)
+			if (*config_count != 6)
 				return (print_err(cfg, "Missing configuration entries", -1));
-			map_started = true;
+			*map_started = true;
+			return (true);
 		}
 		else
 			return (print_err(cfg, "Invalid line before map", -1));
-		i++;
+		(*i)++;
 	}
-	if (!map_started)
-		return (print_err(cfg, "Map not found after configuration", -1));
-	return (map_validation3(cfg));
+	return (true);
 }
