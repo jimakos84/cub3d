@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   freedom.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: eala-lah <eala-lah@student.hive.fi>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/26 13:48:49 by dvlachos          #+#    #+#             */
-/*   Updated: 2025/08/28 17:12:18 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/02 20:00:00 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,27 +32,7 @@ void	free_textures(t_game *game, int count)
 	}
 }
 
-void	free_partial_config(t_config *cfg)
-{
-	int	i;
-
-	i = 0;
-	if (!cfg)
-		return ;
-	if (cfg->map && cfg->map[i])
-	{
-		while (cfg->map[i])
-			free(cfg->map[i++]);
-	}
-	if (cfg->map)
-	{
-		free(cfg->map);
-	}
-	free_cfg_textures(cfg);
-	free(cfg);
-}
-
-void	cleanup_cfg_textures_paths(t_config *cfg)
+static void	free_cfg_paths(t_config *cfg)
 {
 	if (!cfg)
 		return ;
@@ -76,5 +56,26 @@ void	cleanup_cfg_textures_paths(t_config *cfg)
 		free(cfg->sprite_texture_1);
 	if (cfg->sprite_texture_2)
 		free(cfg->sprite_texture_2);
-	clean_cfg_textures_paths2(cfg);
+	cleanup_cfg_textures_paths(cfg);
+}
+
+void	free_partial_config(t_config **cfg_ptr)
+{
+	int			i;
+	t_config	*cfg;
+
+	if (!cfg_ptr || !*cfg_ptr)
+		return ;
+	cfg = *cfg_ptr;
+	i = 0;
+	if (cfg->map)
+	{
+		while (cfg->map[i])
+			free(cfg->map[i++]);
+		free(cfg->map);
+		cfg->map = NULL;
+	}
+	free_cfg_paths(cfg);
+	free(cfg);
+	*cfg_ptr = NULL;
 }

@@ -6,7 +6,7 @@
 /*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 15:29:29 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/08/29 14:00:21 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/02 16:43:42 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,15 @@ int	can_move(t_game *game, float x, float y)
 {
 	int		ix;
 	int		iy;
-	int		height;
 
-	height = map_height(game->cfg->map);
-	if (x < 0.0f || y < 0.0f)
-		return (0);
-	if (y >= (float)height)
-		return (0);
-	if (x >= (float)map_width(game->cfg->map[(int)y]))
-		return (0);
 	ix = (int)x;
 	iy = (int)y;
+	if (x < 0.0f || y < 0.0f)
+		return (0);
+	if (iy >= map_dim(game->cfg->map, MAP_DIM_HEIGHT))
+		return (0);
+	if (ix >= map_dim(&game->cfg->map[iy], MAP_DIM_WIDTH))
+		return (0);
 	if (is_wall_or_door(game, ix, iy))
 		return (0);
 	return (1);
@@ -64,22 +62,22 @@ static void	rotate_player(t_game *game, float angle)
 
 void	update_movement_vector(t_game *game, float *dx, float *dy)
 {
-	if (game->input.w == 1)
+	if (game->input.move_forward)
 	{
 		*dx += game->dir_x;
 		*dy += game->dir_y;
 	}
-	if (game->input.s == 1)
+	if (game->input.move_backward)
 	{
 		*dx -= game->dir_x;
 		*dy -= game->dir_y;
 	}
-	if (game->input.a == 1)
+	if (game->input.move_left)
 	{
 		*dx -= game->plane_x;
 		*dy -= game->plane_y;
 	}
-	if (game->input.d == 1)
+	if (game->input.move_right)
 	{
 		*dx += game->plane_x;
 		*dy += game->plane_y;
@@ -94,10 +92,10 @@ void	update_player_position(t_game *game)
 	float	dy;
 	float	len;
 
-	move = MOVE_SPEED;
-	if (game->input.shift == 1)
-		move = RUN_SPEED;
-	rot = ROT_SPEED;
+	move = PLAYER_WALK_SPEED;
+	if (game->input.run)
+		move = PLAYER_RUN_SPEED;
+	rot = PLAYER_ROT_SPEED;
 	dx = 0.0f;
 	dy = 0.0f;
 	update_movement_vector(game, &dx, &dy);
@@ -109,8 +107,8 @@ void	update_player_position(t_game *game)
 		dy /= len;
 	}
 	move_player(game, dx, dy, move);
-	if (game->input.left == 1)
+	if (game->input.rotate_left)
 		rotate_player(game, -rot);
-	if (game->input.right == 1)
+	if (game->input.rotate_right)
 		rotate_player(game, rot);
 }
