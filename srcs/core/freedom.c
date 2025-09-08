@@ -32,7 +32,7 @@ void	free_textures(t_game *game, int count)
 	}
 }
 
-static void	free_cfg_paths(t_config *cfg)
+void	free_cfg_paths(t_config *cfg)
 {
 	if (!cfg)
 		return ;
@@ -78,4 +78,16 @@ void	free_partial_config(t_config **cfg_ptr)
 	free_cfg_paths(cfg);
 	free(cfg);
 	*cfg_ptr = NULL;
+}
+
+void	free_split(char **split)
+{
+	int		i;
+
+	i = 0;
+	if (!split)
+		return ;
+	while (split[i])
+		free(split[i++]);
+	free(split);
 }

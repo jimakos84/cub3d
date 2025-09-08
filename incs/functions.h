@@ -42,6 +42,7 @@ uint32_t	color_converter(int *rgb);
 int			*color_atoia(const char *color_string);
 bool		process_config_lines2(t_config *cfg, int *i,
 				int *config_count, bool *map_started);
+int			check_last_line(char	*last_line);
 
 /* ************************************************************************** */
 /*                          Parsing utilities                                 */
@@ -50,6 +51,7 @@ bool		is_map_line(char *line);
 bool		is_config_line(char *line);
 bool		is_empty_line(char *line);
 int			print_err(t_config *cfg, char *error, int fd);
+bool		is_valid_number(const char *s);
 void		free_cfg_textures(t_config *cfg);
 
 /* ************************************************************************** */
@@ -58,6 +60,8 @@ void		free_cfg_textures(t_config *cfg);
 void		cleanup_game(t_game *game);
 void		cleanup_cfg_textures_paths(t_config *cfg);
 void		free_partial_config(t_config **cfg_ptr);
+void		free_cfg_paths(t_config *cfg);
+void		free_split(char **split);
 
 /* ************************************************************************** */
 /*                               Raycasting                                   */

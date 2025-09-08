@@ -70,7 +70,7 @@
 /*                                PLAYER                                      */
 /* ========================================================================== */
 # define PLAYER_WALK_SPEED       0.05f
-# define PLAYER_RUN_SPEED        0.09f
+# define PLAYER_RUN_SPEED        0.20f
 # define PLAYER_ROT_SPEED        0.07f
 
 /* ========================================================================== */

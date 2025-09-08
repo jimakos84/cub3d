@@ -38,8 +38,8 @@ static void	cleanup_map_and_textures(t_game *game)
 		mlx_delete_image(game->mlx, game->frame);
 	if (game->z_buffer)
 		free(game->z_buffer);
+	free_cfg_paths(game->cfg);
 	free_textures(game, TEXTURE_COUNT);
-	cleanup_cfg_textures_paths(game->cfg);
 }
 
 static void	cleanup_sprites_and_doors(t_game *game)
@@ -76,7 +76,7 @@ static void	cleanup_cfg(t_game *game)
 		}
 		free(game->cfg->map);
 	}
-	cleanup_cfg_textures_paths(game->cfg);
+	free_cfg_paths(game->cfg);
 	free(game->cfg);
 	game->cfg = NULL;
 }

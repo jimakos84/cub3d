@@ -18,7 +18,7 @@ static int	load_texture(mlx_t *mlx, t_texture *texture, char *path,
 	texture->img = mlx_load_png(path);
 	if (!texture->img)
 	{
-		cleanup_cfg_textures_paths(cfg);
+		free_cfg_paths(cfg);
 		return (0);
 	}
 	texture->width = texture->img->width;
