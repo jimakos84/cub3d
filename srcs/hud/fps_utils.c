@@ -6,24 +6,30 @@
 /*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 14:50:30 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/09/02 19:10:12 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/08 17:14:57 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	draw_fps_pixel(t_game *game, int x, int y, int color)
+void	draw_fps_pixel(t_game *g, int win_x, int win_y, int color)
 {
+	int			frame_x;
+	int			frame_y;
 	uint32_t	*pixel;
 
-	if (x < 0 || x >= game->win_width || y < 0 || y >= game->win_height)
+	if (!g || !g->frame || !g->frame->pixels)
 		return ;
-	pixel = (uint32_t *)game->frame->pixels + y * game->win_width + x;
+	frame_x = win_x * g->frame->width / g->win_width;
+	frame_y = win_y * g->frame->height / g->win_height;
+	if (frame_x < 0 || frame_x >= (int)g->frame->width
+		|| frame_y < 0 || frame_y >= (int)g->frame->height)
+		return ;
+	pixel = (uint32_t *)g->frame->pixels + frame_y * g->frame->width + frame_x;
 	*pixel = color;
 }
 
-void	draw_scaled_pixel(t_game *game, struct s_point pos,
-	int scale, int color)
+void	draw_scaled_pixel(t_game *g, struct s_point pos, int scale, int color)
 {
 	int	dx;
 	int	dy;
@@ -34,14 +40,14 @@ void	draw_scaled_pixel(t_game *game, struct s_point pos,
 		dx = 0;
 		while (dx < scale)
 		{
-			draw_fps_pixel(game, pos.x + dx, pos.y + dy, color);
+			draw_fps_pixel(g, pos.x + dx, pos.y + dy, color);
 			dx++;
 		}
 		dy++;
 	}
 }
 
-void	draw_char(t_game *game, struct s_point pos,
+void	draw_char(t_game *g, struct s_point pos,
 	const char bmap[FONT_ROWS], int scale)
 {
 	int	row;
@@ -54,8 +60,9 @@ void	draw_char(t_game *game, struct s_point pos,
 		while (col < FONT_COLS)
 		{
 			if (bmap[row] & (1 << (FONT_COLS - 1 - col)))
-				draw_scaled_pixel(game, (struct s_point){pos.x + col * scale,
-					pos.y + row * scale}, scale, FPS_CHAR_COLOR);
+				draw_scaled_pixel(g, (struct s_point)
+				{pos.x + col * scale, pos.y + row * scale},
+					scale, FPS_CHAR_COLOR);
 			col++;
 		}
 		row++;

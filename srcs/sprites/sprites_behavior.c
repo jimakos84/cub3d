@@ -6,13 +6,13 @@
 /*   By: eala-lah <eala-lah@student.hive.fi>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/29 17:54:49 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/09/02 20:00:00 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/09 23:40:00 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static void	move_sprite_axis(t_game *game, t_sprite *s, float nx, float ny)
+static void	move_sprite_axis(t_game *g, t_sprite *s, float nx, float ny)
 {
 	const float	coll = SPRITE_COLLISION_MARGIN;
 	float		check_x[2];
@@ -22,11 +22,11 @@ static void	move_sprite_axis(t_game *game, t_sprite *s, float nx, float ny)
 	check_x[1] = nx + coll;
 	check_y[0] = ny - coll;
 	check_y[1] = ny + coll;
-	if (can_move(game, nx, ny)
-		&& can_move(game, check_x[1], check_y[1])
-		&& can_move(game, check_x[0], check_y[1])
-		&& can_move(game, check_x[1], check_y[0])
-		&& can_move(game, check_x[0], check_y[0]))
+	if (can_move(g, nx, ny)
+		&& can_move(g, check_x[1], check_y[1])
+		&& can_move(g, check_x[0], check_y[1])
+		&& can_move(g, check_x[1], check_y[0])
+		&& can_move(g, check_x[0], check_y[0]))
 	{
 		s->x = nx;
 		s->y = ny;
@@ -82,25 +82,30 @@ static uint32_t	blend_color(uint32_t dst_c, uint32_t src_c)
 	return (0xFF000000u | (r << 16) | (gc << 8) | b);
 }
 
-static void	draw_sprite_column(t_sprite *s, int x, uint32_t *dst, t_game *g)
+static void	draw_sprite_column(t_game *g, t_sprite *s,
+					uint32_t *dst, int xi)
 {
-	t_texture	*tex;
-	int			y;
-	int			tex_x;
-	int			tex_y;
+	t_tex	*t;
+	int		y;
+	int		tx;
+	int		ty;
+	int		yi;
 
-	tex = s->frames[s->frame_index];
-	if (!tex || !tex->img || !tex->img->pixels)
+	t = s->frames[s->frame_index];
+	if (!t || !t->img || !t->img->pixels || s->width <= 0 || s->height <= 0)
 		return ;
-	tex_x = (x - s->start_x) * tex->width / s->width;
+	tx = (xi * g->win_width / g->frame->width - s->start_x)
+		* t->width / s->width;
 	y = s->start_y;
 	while (y <= s->end_y)
 	{
 		if (y >= 0 && y < (int)g->win_height)
 		{
-			tex_y = (y - s->start_y) * tex->height / s->height;
-			dst[y * g->win_width + x] = blend_color(dst[y * g->win_width + x],
-					get_texture_color_from_tex(tex, tex_x, tex_y));
+			ty = (y - s->start_y) * t->height / s->height;
+			yi = y * g->frame->height / g->win_height;
+			dst[yi * g->frame->width + xi] = blend_color(
+					dst[yi * g->frame->width + xi],
+					get_tex_color_from_tex(t, tx, ty));
 		}
 		y++;
 	}
@@ -109,16 +114,20 @@ static void	draw_sprite_column(t_sprite *s, int x, uint32_t *dst, t_game *g)
 void	draw_sprite_stripe(t_game *g, t_sprite *s, float *zb)
 {
 	uint32_t	*dst;
-	int			x;
+	int			wx;
+	int			xi;
 
 	if (!g || !g->frame || !s || !zb)
 		return ;
+	if (s->start_x > s->end_x || s->start_y > s->end_y)
+		return ;
 	dst = (uint32_t *)g->frame->pixels;
-	x = s->start_x;
-	while (x <= s->end_x)
+	wx = s->start_x;
+	while (wx <= s->end_x)
 	{
-		if (x >= 0 && x < g->win_width && s->perp_dist < zb[x])
-			draw_sprite_column(s, x, dst, g);
-		x++;
+		xi = wx * g->frame->width / g->win_width;
+		if (xi >= 0 && xi < (int)g->frame->width && s->perp_dist < zb[xi])
+			draw_sprite_column(g, s, dst, xi);
+		wx++;
 	}
 }

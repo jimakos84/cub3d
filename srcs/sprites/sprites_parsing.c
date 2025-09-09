@@ -3,38 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   sprites_parsing.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eala-lah <eala-lah@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: eala-lah <eala-lah@student.hive.fi>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/13 13:43:52 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/09/02 19:07:05 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/09 23:30:00 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-static int	count_sprites(char **map)
+static int	count_sprites(char **m)
 {
-	int	c;
-	int	y;
+	int	i;
 	int	x;
+	int	y;
 
-	c = 0;
+	i = 0;
 	y = 0;
-	while (map[y])
+	while (m[y])
 	{
 		x = 0;
-		while (map[y][x])
-			if (map[y][x++] == TILE_SPRITE)
-				c++;
+		while (m[y][x])
+		{
+			if (m[y][x] == TILE_SPRITE)
+				i++;
+			x++;
+		}
 		y++;
 	}
-	return (c);
+	return (i);
 }
 
 void	parse_sprites(t_game *g)
 {
-	int	y;
 	int	x;
+	int	y;
 	int	i;
 
 	g->num_sprites = count_sprites(g->cfg->map);
@@ -46,24 +49,30 @@ void	parse_sprites(t_game *g)
 	if (!g->sprites)
 		exit(EXIT_FAILURE);
 	i = 0;
-	y = -1;
-	while (g->cfg->map[++y])
+	y = 0;
+	while (g->cfg->map[y])
 	{
-		x = -1;
-		while (g->cfg->map[y][++x])
+		x = 0;
+		while (g->cfg->map[y][x])
+		{
 			if (g->cfg->map[y][x] == TILE_SPRITE && i < g->num_sprites)
 				init_sprite(g, &g->sprites[i++], x, y);
+			x++;
+		}
+		y++;
 	}
 }
 
 void	update_sprite_distances(t_game *g)
 {
 	int		i;
+	int		num;
 	float	dx;
 	float	dy;
 
 	i = 0;
-	while (i < g->num_sprites)
+	num = g->num_sprites;
+	while (i < num)
 	{
 		dx = g->sprites[i].x - g->player_x;
 		dy = g->sprites[i].y - g->player_y;
@@ -76,13 +85,15 @@ static void	sort_sprites(t_game *g)
 {
 	int			i;
 	int			j;
+	int			num;
 	t_sprite	tmp;
 
-	i = -1;
-	while (++i < g->num_sprites - 1)
+	num = g->num_sprites;
+	i = 0;
+	while (i < num - 1)
 	{
-		j = i;
-		while (++j < g->num_sprites)
+		j = i + 1;
+		while (j < num)
 		{
 			if (g->sprites[i].dist < g->sprites[j].dist)
 			{
@@ -90,7 +101,9 @@ static void	sort_sprites(t_game *g)
 				g->sprites[i] = g->sprites[j];
 				g->sprites[j] = tmp;
 			}
+			j++;
 		}
+		i++;
 	}
 }
 

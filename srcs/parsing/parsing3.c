@@ -62,10 +62,10 @@ static int	read_map_lines(t_config *cfg, char *filename)
 	cfg->map[i] = NULL;
 	close(fd);
 	i = 0;
-	while (!is_map_line(cfg->map[i]))
+	while (cfg->map[i] && !is_map_line(cfg->map[i]))
 		i++;
-	if (!map_is_enclosed(cfg, i))
-		return (-1);
+	if (!cfg->map[i] || !map_is_enclosed(cfg, i))
+		return (print_err(cfg, "Error with map", -2));
 	return (max_len);
 }
 

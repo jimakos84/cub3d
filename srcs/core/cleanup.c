@@ -6,92 +6,108 @@
 /*   By: eala-lah <eala-lah@student.hive.fi>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 13:44:13 by eala-lah          #+#    #+#             */
-/*   Updated: 2025/09/02 20:00:00 by eala-lah         ###   ########.fr       */
+/*   Updated: 2025/09/09 22:10:00 by eala-lah         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3d.h"
 
-void	cleanup_cfg_textures_paths(t_config *cfg)
+void	free_config_textures(t_config *cfg)
 {
 	if (!cfg)
 		return ;
-	cfg->ceiling_color = NULL;
-	cfg->floor_color = NULL;
-	cfg->north_texture = NULL;
-	cfg->south_texture = NULL;
-	cfg->west_texture = NULL;
-	cfg->east_texture = NULL;
-	cfg->door_texture = NULL;
-	cfg->sprite_texture_0 = NULL;
-	cfg->sprite_texture_1 = NULL;
-	cfg->sprite_texture_2 = NULL;
+	if (cfg->ceiling_color)
+		ft_free(&cfg->ceiling_color);
+	if (cfg->floor_color)
+		ft_free(&cfg->floor_color);
+	if (cfg->north_tex)
+		ft_free(&cfg->north_tex);
+	if (cfg->south_tex)
+		ft_free(&cfg->south_tex);
+	if (cfg->west_tex)
+		ft_free(&cfg->west_tex);
+	if (cfg->east_tex)
+		ft_free(&cfg->east_tex);
+	if (cfg->door_tex)
+		ft_free(&cfg->door_tex);
+	if (cfg->sprite_tex_0)
+		ft_free(&cfg->sprite_tex_0);
+	if (cfg->sprite_tex_1)
+		ft_free(&cfg->sprite_tex_1);
+	if (cfg->sprite_tex_2)
+		ft_free(&cfg->sprite_tex_2);
 }
 
-static void	cleanup_map_and_textures(t_game *game)
+void	free_config(t_config **cfg_ptr)
 {
-	if (!game)
+	int			i;
+	t_config	*cfg;
+
+	if (!cfg_ptr || !*cfg_ptr)
 		return ;
-	if (game->img)
-		mlx_delete_image(game->mlx, game->img);
-	if (game->frame)
-		mlx_delete_image(game->mlx, game->frame);
-	if (game->z_buffer)
-		free(game->z_buffer);
-	free_cfg_paths(game->cfg);
-	free_textures(game, TEXTURE_COUNT);
+	cfg = *cfg_ptr;
+	i = 0;
+	if (cfg->map)
+	{
+		while (cfg->map[i])
+			ft_free(&cfg->map[i++]);
+		free(cfg->map);
+	}
+	free_config_textures(cfg);
+	free(cfg);
+	*cfg_ptr = NULL;
 }
 
-static void	cleanup_sprites_and_doors(t_game *game)
-{
-	if (!game)
-		return ;
-	if (game->sprites)
-	{
-		free(game->sprites);
-		game->sprites = NULL;
-		game->num_sprites = 0;
-	}
-	if (game->doors)
-	{
-		free(game->doors);
-		game->doors = NULL;
-		game->num_doors = 0;
-	}
-}
-
-static void	cleanup_cfg(t_game *game)
+void	free_textures(t_game *g)
 {
 	int	i;
 
-	if (!game || !game->cfg)
+	if (!g || !g->tex)
 		return ;
-	if (game->cfg->map)
+	i = 0;
+	while (i < TEX_COUNT)
 	{
-		i = 0;
-		while (game->cfg->map[i])
+		if (g->tex[i])
 		{
-			free(game->cfg->map[i]);
-			i++;
+			if (g->tex[i]->img)
+				mlx_delete_texture(g->tex[i]->img);
+			free(g->tex[i]);
+			g->tex[i] = NULL;
 		}
-		free(game->cfg->map);
+		i++;
 	}
-	free_cfg_paths(game->cfg);
-	free(game->cfg);
-	game->cfg = NULL;
 }
 
-void	cleanup_game(t_game *game)
+static void	free_game_resources(t_game *g)
 {
-	if (!game)
+	if (!g)
 		return ;
-	cleanup_map_and_textures(game);
-	cleanup_sprites_and_doors(game);
-	cleanup_cfg(game);
-	if (game->mlx)
-		mlx_terminate(game->mlx);
-	game->mlx = NULL;
-	game->img = NULL;
-	game->frame = NULL;
-	game->z_buffer = NULL;
+	if (g->img)
+		mlx_delete_image(g->mlx, g->img);
+	if (g->frame)
+		mlx_delete_image(g->mlx, g->frame);
+	if (g->z_buffer)
+		free(g->z_buffer);
+	if (g->sprites)
+		free(g->sprites);
+	if (g->doors)
+		free(g->doors);
+	free_textures(g);
+}
+
+void	cleanup_game(t_game *g)
+{
+	if (!g)
+		return ;
+	free_game_resources(g);
+	if (g->cfg)
+		free_config(&g->cfg);
+	if (g->mlx)
+		mlx_terminate(g->mlx);
+	g->mlx = NULL;
+	g->img = NULL;
+	g->frame = NULL;
+	g->z_buffer = NULL;
+	g->sprites = NULL;
+	g->doors = NULL;
 }
